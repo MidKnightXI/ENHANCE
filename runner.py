@@ -64,9 +64,10 @@ def denoise_image(model, image_path, output_directory):
     save_image(denoised_image, output_path)
 
 def denoise_images_in_directory(model, input_directory, output_directory):
+    files = os.listdir(input_directory)
     os.makedirs(output_directory, exist_ok=True)
 
-    for filename in os.listdir(input_directory):
+    for filename in files:
         if filename.endswith(('.jpg', '.jpeg', '.png')):
             image_path = os.path.join(input_directory, filename)
             denoise_image(model, image_path, output_directory)

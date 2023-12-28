@@ -83,7 +83,7 @@ def main():
 
     if os.path.isdir(input_path):
         denoise_images_in_directory(model, input_path, output_directory)
-    elif os.path.isfile(input_path):
+    elif os.path.isfile(input_path) and filename.endswith(('.jpg', '.jpeg', '.png')):
         denoise_image(model, input_path, output_directory)
     else:
         print("Invalid input path. Please provide a valid file or directory.")

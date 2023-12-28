@@ -39,33 +39,37 @@ class DenoisingAutoencoder(nn.Module):
 def setup_argparse():
     parser = argparse.ArgumentParser(description='Denoise images using a pre-trained autoencoder model.')
     parser.add_argument(
-        'input_directory',
+        'input',
         type=str,
-        help='Path to the input directory containing images for denoising.')
+        help='Path to the input directory or file')
     return parser.parse_args()
 
-def denoise_images_in_directory(model, input_directory, output_directory):
+def denoise_image(model, image_path, output_directory):
     transform = transforms.Compose([
         transforms.ToTensor(),
     ])
 
+    filename = os.path.basename(image_path)
+    output_path = os.path.join(
+        output_directory,
+        f"{os.path.splitext(filename)[0]}_denoised.jpg")
+
+    sample_image = Image.open(image_path).convert("RGB")
+
+    input_image = transform(sample_image).unsqueeze(0)
+
+    with torch.no_grad():
+        denoised_image = model(input_image)
+
+    save_image(denoised_image, output_path)
+
+def denoise_images_in_directory(model, input_directory, output_directory):
     os.makedirs(output_directory, exist_ok=True)
 
     for filename in os.listdir(input_directory):
         if filename.endswith(('.jpg', '.jpeg', '.png')):
             image_path = os.path.join(input_directory, filename)
-            output_path = os.path.join(
-                output_directory,
-                f"{os.path.splitext(filename)[0]}_denoised.jpg")
-
-            sample_image = Image.open(image_path).convert("RGB")
-
-            input_image = transform(sample_image).unsqueeze(0)
-
-            with torch.no_grad():
-                denoised_image = model(input_image)
-
-            save_image(denoised_image, output_path)
+            denoise_image(model, image_path, output_directory)
 
 def main():
     args = setup_argparse()
@@ -74,10 +78,15 @@ def main():
     model.load_state_dict(torch.load('denoising_model.pth'))
     model.eval()
 
-    input_directory = args.input_directory
-    output_directory = os.path.join(input_directory, 'denoised_output')
+    input_path = args.input
+    output_directory = os.path.join(os.path.dirname(input_path), 'denoised_output')
 
-    denoise_images_in_directory(model, input_directory, output_directory)
+    if os.path.isdir(input_path):
+        denoise_images_in_directory(model, input_path, output_directory)
+    elif os.path.isfile(input_path):
+        denoise_image(model, input_path, output_directory)
+    else:
+        print("Invalid input path. Please provide a valid file or directory.")
 
 if __name__ == "__main__":
     main()

@@ -36,13 +36,22 @@ class DenoisingAutoencoder(nn.Module):
         x = self.decoder(x)
         return x
 
-def setup_argparse():
-    parser = argparse.ArgumentParser(description='Denoise images using a pre-trained autoencoder model.')
-    parser.add_argument(
-        'input',
-        type=str,
-        help='Path to the input directory or file')
-    return parser.parse_args()
+def setup_argparse() -> ArgumentParser:
+    parser = ArgumentParser(
+        prog="blurwarp",
+        description="Detection of blurry images using ResNet50 AI model",
+        epilog="If you encounter any problem please submit an issue here: https://github.com/MidKnightXI/ENHANCE")
+
+    parser.add_argument("-t", "--target",
+                        type=str,
+                        required=True,
+                        help="Define in which directory the model will analyze the images")
+    parser.add_argument("-o", "--output",
+                        default="predictions.json",
+                        type=str,
+                        help="Define the path of the output file eg: ./out/pred.json")
+    args = parser.parse_args()
+    return args
 
 def denoise_image(model, image_path, output_directory):
     transform = transforms.Compose([
@@ -79,8 +88,8 @@ def main():
     model.load_state_dict(torch.load('denoising_model.pth'))
     model.eval()
 
-    input_path = args.input
-    output_directory = os.path.join(os.path.dirname(input_path), 'denoised_output')
+    input_path = args.target
+    output_directory = args.output
 
     if os.path.isdir(input_path):
         denoise_images_in_directory(model, input_path, output_directory)

@@ -1,10 +1,11 @@
 {
     "name": "ENHANCE",
-    "version": "v1.0.0",
+    "version": "1.0.0",
     "module_type": "action",
     "program_filename": "enhance",
     "mandatory_arguments": {
-        "input": ""
+        "path": "--target",
+        "output": "--output"
     },
     "optional_arguments": null,
     "action": {

@@ -36,16 +36,26 @@ class DenoisingAutoencoder(nn.Module):
         x = self.decoder(x)
         return x
 
+def parse_json_string(json_string):
+    try:
+        data = json.loads(json_string)
+        if isinstance(data, list) and all(isinstance(item, str) for item in data):
+            return data
+        else:
+            raise ArgumentTypeError("JSON string must be an array of strings.")
+    except json.JSONDecodeError as e:
+        raise ArgumentTypeError(f"Invalid JSON string: {e}")
+
 def setup_argparse() -> ArgumentParser:
     parser = ArgumentParser(
-        prog="blurwarp",
-        description="Detection of blurry images using ResNet50 AI model",
+        prog="enhance",
+        description="Deblur images using a lightweight ai model",
         epilog="If you encounter any problem please submit an issue here: https://github.com/MidKnightXI/ENHANCE")
 
-    parser.add_argument("-t", "--target",
-                        type=str,
+    parser.add_argument("target",
+                        type=parse_json_string,
                         required=True,
-                        help="Define in which directory the model will analyze the images")
+                        help="Define the JSON string specifying which directories the model will analyze the images from")
     parser.add_argument("-o", "--output",
                         default="predictions.json",
                         type=str,
@@ -88,15 +98,16 @@ def main():
     model.load_state_dict(torch.load('denoising_model.pth'))
     model.eval()
 
-    input_path = args.target
+    targets = args.targets
     output_directory = args.output
 
-    if os.path.isdir(input_path):
-        denoise_images_in_directory(model, input_path, output_directory)
-    elif os.path.isfile(input_path) and filename.endswith(('.jpg', '.jpeg', '.png')):
-        denoise_image(model, input_path, output_directory)
-    else:
-        print("Invalid input path. Please provide a valid file or directory.")
+    for target in targets:
+        if os.path.isdir(target):
+            denoise_images_in_directory(model, target, output_directory)
+        elif os.path.isfile(target) and target.lower().endswith(('.jpg', '.jpeg', '.png')):
+            denoise_image(model, target, output_directory)
+        else:
+            print(f"Invalid input path: {target}. Please provide a valid file or directory.")
 
 if __name__ == "__main__":
     main()

@@ -57,9 +57,9 @@ def setup_argparse() -> ArgumentParser:
                         required=True,
                         help="Define the JSON string specifying which directories the model will analyze the images from")
     parser.add_argument("-o", "--output",
-                        default="predictions.json",
                         type=str,
-                        help="Define the path of the output file eg: ./out/pred.json")
+                        required=True,
+                        help="Define the path of the output file eg: /out")
     args = parser.parse_args()
     return args
 

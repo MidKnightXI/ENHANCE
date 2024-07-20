@@ -1,3 +1,3 @@
 # ENHANCE
 
-AI model to denoise images 
+AI model to denoise images

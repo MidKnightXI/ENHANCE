@@ -1,7 +1,7 @@
 {
     "name": "ENHANCE",
     "version": "v1.0.0",
-    "description": "Deblur noisy images with a lightweight AI model. Requires python3 to run the model",
+    "description": "Improves noisy images quality with a lightweight AI model. Requires python3 to run the model",
     "type": "reaction",
     "arguments": [
         {
@@ -10,5 +10,6 @@
         }
     ],
     "binary": "runner.py",
-    "runtime": "python3"
+    "runtime": "python3",
+    "post_installation_command": "pip3 -r requirements.txt"
 }

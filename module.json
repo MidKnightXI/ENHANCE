@@ -6,7 +6,8 @@
     "arguments": [
         {
             "name": "--output",
-            "type": "string"
+            "type": "string",
+            "values": null
         }
     ],
     "binary": "runner.py",
